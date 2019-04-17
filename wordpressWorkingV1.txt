@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+
+	<meta charset="utf-8">
+	<title>Memory Game</title>
+	<meta name="description" content="JS Memory Game">
+	<meta name="keywords" content="javascript, jQuery, game,memory">
+	<meta name="author" content="AndrzejBronski">
+	
+	<meta http-equiv="X-Ua-Compatible" content="IE=edge,chrome=1">
+	
+	<link rel="stylesheet" href="main.css">
+
+	<link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
+	
+	<!--[if lt IE 9]>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+	<![endif]-->
+<style>
+body
+{
+	margin: 0;
+	background-color: #26282E;
+	color: #209781;
+    font-family: 'Indie Flower', cursive;
+    font-size: 22px;
+}
+
+a:link    { color: #209781; text-decoration: none; }
+a:visited { color: #209781; }
+a:active  { color: #209781; }
+a:hover   { color: #E9B64A; }
+
+h1
+{
+	font-size: 30px;
+	font-weight: 400;
+	text-align: center;
+	letter-spacing: 5px;
+	margin-top: 5px;
+	margin-bottom: 0px;
+}
+p
+{
+	text-align: center;
+	margin-top: 5px;
+	margin-bottom: 15px;
+	letter-spacing: 2px;
+}
+.board
+{
+	width: 700px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;	
+}
+
+.card
+{
+	width: 134px;
+	height: 134px;
+	display: inline-block;
+	margin: 3px;
+	background-image: url("http://www.andrzejbronski.pl/wp-content/uploads/2019/04/back.png");
+
+	border:4px solid #51C8B2;
+	border-radius: 4px;
+	cursor: pointer;
+	filter: brightness(70%);
+	transition: all .3s ease-in-out;
+}
+.card:hover
+{
+	border: 4px solid #00CED1;
+	filter: brightness(100%);
+}
+.cardA
+{
+	width: 134px;
+	height: 134px;
+	display: inline-block;
+	margin: 3px;
+	background-image: url("http://www.andrzejbronski.pl/wp-content/uploads/2019/04/back.png");
+	border: 4px solid #00CED1;
+	border-radius: 4px;
+	cursor: default;
+	filter: brightness(100%);
+	transition: all .3s ease-in-out;
+}
+
+.score
+{
+	margin-top: 0px;
+	letter-spacing: 2px;
+}
+button
+{
+	border:4px solid #51C8B2;
+	padding: 8px 16px;
+	filter: brightness(70%);
+	margin-top: 5px;
+}
+button:hover
+{
+	filter: brightness(100%);
+	cursor: pointer;
+	transition: all .3s ease-in-out;
+}
+
+</style>
+</head>
+
+<body>
+	<header>
+	
+	<h1>Memory fruits game</h1>
+	<p id="p1">My first game in JS using jQuery. Created by <a href="http://www.andrzejbronski.pl" target="_blank">Andrzej Bronski</a></p>
+	
+	</header>
+	<main>
+		<article>
+			<div class="board">
+				<div class="card" id="c0"></div>
+				<div class="card" id="c1"></div>
+				<div class="card" id="c2"></div>
+				<div class="card" id="c3"></div>
+				
+				<div class="card" id="c4"></div>
+				<div class="card" id="c5"></div>
+				<div class="card" id="c6"></div>
+				<div class="card" id="c7"></div>
+				
+				<div class="card" id="c8"></div>
+				<div class="card" id="c9"></div>
+				<div class="card" id="c10"></div>
+				<div class="card" id="c11"></div>
+				
+				<div class="score">Turn counter:0</div>
+				<button type="button">Restart</button>
+			</div>
+		</article>
+	</main>
+
+        <script>
+
+         var cards = ["apple.png","avocado.png","blackberry.png","blueberry.png","mango.png","strawberry.png",
+			 "apple.png","avocado.png","blackberry.png","blueberry.png","mango.png","strawberry.png"];
+
+	cards = shuffle(cards);
+	
+		var c0 = document.getElementById('c0');
+		var c1 = document.getElementById('c1');
+		var c2 = document.getElementById('c2');
+		var c3 = document.getElementById('c3');
+		var c4 = document.getElementById('c4');
+		var c5 = document.getElementById('c5');
+		var c6 = document.getElementById('c6');
+		var c7 = document.getElementById('c7');
+		var c8 = document.getElementById('c8');
+		var c9 = document.getElementById('c9');
+		var c10 = document.getElementById('c10');
+		var c11 = document.getElementById('c11');
+		
+		c0.addEventListener("click", function() {revealCard(0);});
+		c1.addEventListener("click", function() {revealCard(1);});
+		c2.addEventListener("click", function() {revealCard(2);});
+		c3.addEventListener("click", function() {revealCard(3);});
+		c4.addEventListener("click", function() {revealCard(4);});
+		c5.addEventListener("click", function() {revealCard(5);});
+		c6.addEventListener("click", function() {revealCard(6);});
+		c7.addEventListener("click", function() {revealCard(7);});
+		c8.addEventListener("click", function() {revealCard(8);});
+		c9.addEventListener("click", function() {revealCard(9);});
+		c10.addEventListener("click", function() {revealCard(10);});
+		c11.addEventListener("click", function() {revealCard(11);});
+		
+	var oneVisible = false;
+	var turnCounter =0;
+	var visibleNr;
+	var lock = false;
+	var pairsLeft = 6;
+		
+function revealCard(nr)
+{
+var opacityValue = jQuery('#c'+nr).css('opacity');
+if(opacityValue !=0 && lock == false)
+{
+lock = true;
+var image = "url(http://www.andrzejbronski.pl/wp-content/uploads/2019/04/"+cards[nr]+")";
+
+jQuery('#c'+nr).css("background-image", image);
+jQuery('#c'+nr).addClass('cardA');
+jQuery('#c'+nr).removeClass('card');
+if(oneVisible == false){
+//first card
+oneVisible = true;
+visible_nr = nr;
+lock = false;
+}
+else{
+//second card
+if(cards[visible_nr] ==cards[nr])
+{
+setTimeout(function() {hideTwoCards(nr,visible_nr)},750);
+
+}else
+{
+setTimeout(function() {restoreTwoCards(nr,visible_nr)},850);
+}
+turnCounter++;
+jQuery('.score').html('Turn counter: '+turnCounter);
+oneVisible = false;
+}
+}
+}
+function hideTwoCards(nr1,nr2)
+{
+jQuery('#c'+nr1).css('opacity','0');
+jQuery('#c'+nr2).css('opacity','0');
+pairsLeft--;
+if(pairsLeft == 0)
+{
+jQuery('.board').html('<h1>You win!<br>Done in '+turnCounter+' turns</h1><button type="button">Restart</button>');
+reload();
+}
+lock = false;
+}
+function restoreTwoCards(nr1,nr2)
+{
+jQuery('#c'+nr1).css('background-image',
+'url(http://www.andrzejbronski.pl/wp-content/uploads/2019/04/back.png)');
+jQuery('#c'+nr1).addClass('card');
+jQuery('#c'+nr1).removeClass('cardA');
+
+jQuery('#c'+nr2).css('background-image',
+'url(http://www.andrzejbronski.pl/wp-content/uploads/2019/04/back.png)');
+jQuery('#c'+nr2).addClass('card');
+jQuery('#c'+nr2).removeClass('cardA');
+
+lock = false;
+}
+function shuffle(array) 
+{
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  while (0 !== currentIndex) {
+
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+  
+  return array;
+}
+function reload()
+{
+	jQuery('button').click(function(){location.reload(false);});
+}
+reload();
+    </script>
+
+</body>
+</html>
